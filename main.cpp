@@ -23,7 +23,7 @@
 //#define SPI_BUF_SIZE     (LED_NUM * BITS_PER_LED * BYTES_PER_SPI_BIT)
 
 // --- 全域變數 ---
-int LED_NUM=10;
+int LED_NUM=45;
 int spi_fd = -1;
  // 初始化 SPI 裝置
 // --- 關鍵修正：改用動態容器 ---
@@ -139,13 +139,19 @@ void set_led_colorxxx(int index, uint8_t r, uint8_t g, uint8_t b) {
 
 // 模擬 TI 的 Show 函數，將 Buffer 送出
 void ws2812_show() {
-    // 使用 .data() 取得 vector 內部陣列的指標
+	// 使用 .data() 取得 vector 內部陣列的指標
     // 使用 .size() 取得動態計算出的總位元組長度
-    if (write(spi_fd, spi_buffer.data(), spi_buffer.size()) < 0) {
+    ssize_t n = write(spi_fd, spi_buffer.data(), spi_buffer.size());
+    if (n < 0) {
         perror("SPI 傳輸失敗");
+        if (errno == EMSGSIZE) {
+            std::cerr << "錯誤：資料量太大，請檢查 /boot/firmware/cmdline.txt 是否加入 spidev.bufsiz=65536" << std::endl;
+        }
     }
-    usleep(300); // WS2812B 需要至少 300us 的低電平作為 Reset 訊號
+    usleep(300);  // WS2812B 需要至少 300us 的低電平作為 Reset 訊號
 }
+
+ 
 //----------------------EFFECTIONS SATRT HERE ------------------------//
 
 
