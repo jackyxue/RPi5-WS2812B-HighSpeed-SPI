@@ -3,7 +3,7 @@ CXX = g++
 CC = gcc
 
 # 編譯選項：啟用最佳化 (-O3) 與所有警告 (-Wall)
-CXXFLAGS = -O3 -Wall -std=c++11
+CXXFLAGS = -O3 -Wall   -std=c++17
 LIBS = 
 
 # 目標執行檔名稱

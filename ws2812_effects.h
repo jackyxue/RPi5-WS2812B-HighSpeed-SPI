@@ -7,7 +7,7 @@
 #include <map>
 #include <string>    // <--- 必須加上這一行
 #include <functional> // 必須包含，用於 std::function
-
+#include <chrono>
 
 // 定義特效完整資訊的結構
 struct EffectInfo {
@@ -16,21 +16,36 @@ struct EffectInfo {
     int category;            // 分類 (1:基礎, 2:生物, 3:物理, 4:隨機)
 };
 
+typedef  struct PrideRGB { 
+    uint8_t r, g, b; 
+}PRIDERGB ;
+ 
+
 // 關鍵：讓所有包含此檔的 .cpp 都能存取同一個 LED_NUM
 extern int LED_NUM; 
-
-
+extern std::vector<PrideRGB> led_shadow_buffer;
+// 使用 extern 宣告全域時間起點
+extern std::chrono::high_resolution_clock::time_point base_time;
 
 // 告知編譯器：這個 map 的實體在別的 .cpp 檔案裡
 extern std::map<int, EffectInfo> effect_help_map;
+int get_id_by_name(std::string name);
+
+extern PrideRGB get_led_color(int index);
 
 // 宣告在 main.cpp 實作的底層函數
 extern void set_led_color(int index, uint8_t r, uint8_t g, uint8_t b);
 extern void ws2812_show();
 extern void delay_ms(uint32_t ms);
 extern uint32_t Wheel(uint8_t WheelPos);
+extern PrideRGB hsv2rgb(uint8_t h, uint8_t s, uint8_t v);
 
 extern void render_fixed_hue_frame(float hue, float intensity);
+extern void render_sinelon_point(float t, uint8_t r, uint8_t g, uint8_t b);
+extern void draw_sinelon_head(float t, uint8_t r, uint8_t g, uint8_t b);
+
+extern uint8_t beat8(float bpm, float t) ;
+extern float get_t() ;
 
 // --- 燈效函數原型 ---
 void eff_1_color_wipe(uint8_t r, uint8_t g, uint8_t b, int wait);
@@ -45,7 +60,7 @@ void eff_heartbeat_biological(uint8_t r, uint8_t g, uint8_t b, int wait);
 void eff_heartbeat_biological_slow(uint8_t r, uint8_t g, uint8_t b);
 void eff_heartbeat_extreme(uint8_t r, uint8_t g, uint8_t b);
 void eff_hyper_flash_rgb_fade();
-void eff_hyper_flash_rgb_fade_fixed_color(float current_hue);
+void eff_52_hyper_flash_fixed(float t, float current_hue); 
 
 void eff_color_flow(int wait);
 void eff_soft_comet(uint8_t r, uint8_t g, uint8_t b, int wait);
@@ -86,6 +101,23 @@ bool eff_33_stack_tetris_enhanced(uint8_t r, uint8_t g, uint8_t b, int wait);
 void eff_30_pulse_collision_tick(uint8_t r1, uint8_t g1, uint8_t b1, uint8_t r2, uint8_t g2, uint8_t b2, float speed, float t);
 void eff_31_plasma_flow_tick(float t);
 
+
+void eff_42_cyber_scanner(uint8_t r, uint8_t g, uint8_t b, int wait) ;
+void eff_43_forest_mist(float t) ;
+void eff_44_star_burst(int density);
+
+void eff_45_pride_2015(float t) ;
+void eff_46_sinelon(float t, uint8_t r, uint8_t g, uint8_t b);
+
+
+void eff_47_sinelon_rainbow(float t);                         // 新增的彩色版
+void eff_48_aurora_sinelon(float t);
+void eff_49_dual_sinelon(float t);
+void eff_50_dual_sinelon_sparkle(float t);
+void eff_51_static_rainbow_step(float t, float display_time);
+
+
+
 // 在原型宣告區加入
 void eff_999_system_error_alert();
 
@@ -93,10 +125,11 @@ void eff_999_system_error_alert();
 
 
 void print_detailed_help(char* prog_name);
-void run_effect_by_id(int id) ;
+void run_effect_by_id(int id, float t) ;
+void run_effect_loop(int id, float t) ;
 void demo_all_effections(void);
 
-
+float get_elapsed_t();
 
 
 
